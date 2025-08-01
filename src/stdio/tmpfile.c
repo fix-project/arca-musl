@@ -13,7 +13,7 @@ FILE *tmpfile(void)
 	int try;
 	for (try=0; try<MAXTRIES; try++) {
 		__randname(s+13);
-		fd = sys_open(s, O_RDWR|O_CREAT|O_EXCL, 0600);
+		fd = __sys_open(s, O_RDWR|O_CREAT|O_EXCL, 0600);
 		if (fd >= 0) {
 #ifdef SYS_unlink
 			__syscall(SYS_unlink, s);

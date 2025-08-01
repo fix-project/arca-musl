@@ -3,4 +3,8 @@
 
 #include <bits/syscall.h>
 
+#include <arca/thread.h>
+#include <arca/io.h>
+#include <arca/mem.h>
+
 #endif

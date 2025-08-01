@@ -1,6 +1,6 @@
 #define __NR_read				0
 #define __NR_write				1
-#define __NR_open				2
+// #define __NR_open				2
 #define __NR_close				3
 #define __NR_stat				4
 #define __NR_fstat				5
@@ -18,7 +18,7 @@
 #define __NR_pread64			17
 #define __NR_pwrite64			18
 #define __NR_readv				19
-#define __NR_writev				20
+// #define __NR_writev				20
 #define __NR_access				21
 #define __NR_pipe				22
 #define __NR_select				23
@@ -58,7 +58,7 @@
 #define __NR_fork				57
 #define __NR_vfork				58
 #define __NR_execve				59
-#define __NR_exit				60
+// #define __NR_exit				60
 #define __NR_wait4				61
 #define __NR_kill				62
 #define __NR_uname				63
@@ -216,7 +216,7 @@
 #define __NR_epoll_wait_old			215
 #define __NR_remap_file_pages		216
 #define __NR_getdents64				217
-#define __NR_set_tid_address		218
+// #define __NR_set_tid_address		218
 #define __NR_restart_syscall		219
 #define __NR_semtimedop				220
 #define __NR_fadvise64				221

@@ -1,0 +1,9 @@
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*.c, *.h]
+indent_style = tab
+tab_width = 8
+end_of_line = lf
+insert_final_newline = true
+max_line_length = 80

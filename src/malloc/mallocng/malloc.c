@@ -60,13 +60,13 @@ struct meta *alloc_meta(void)
 			int need_guard = 0;
 			if (!ctx.brk) {
 				need_guard = 1;
-				ctx.brk = brk(0);
+				ctx.brk = (uintptr_t)__sys_brk(0);
 				// some ancient kernels returned _ebss
 				// instead of next page as initial brk.
 				ctx.brk += -ctx.brk & (pagesize-1);
 				new = ctx.brk + 2*pagesize;
 			}
-			if (brk(new) != new) {
+			if ((uintptr_t)__sys_brk((void *)new) != new) {
 				ctx.brk = -1;
 			} else {
 				if (need_guard) mmap((void *)ctx.brk, pagesize,
