@@ -9,8 +9,8 @@
 typedef int64_t arcad;
 
 struct arca_entry {
-	int mode;
-	int datatype;
+	unsigned mode;
+	unsigned datatype;
 	size_t data;
 };
 
@@ -52,7 +52,7 @@ arcad arca_function_force(arcad function);
 int64_t arca_table_map(arcad table, void *address, struct arca_entry *entry);
 
 int64_t arca_mmap(void *address, struct arca_entry *entry);
-int64_t arca_mprotect(void *address, bool writeable);
+int64_t arca_mprotect(void *address, int mode);
 
 int64_t arca_call_with_current_continuation(arcad value);
 

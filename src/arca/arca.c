@@ -3,6 +3,11 @@
 
 void arca_log(const char *s) { arca_debug_log((const uint8_t *)s, strlen(s)); }
 
+void arca_log_int(const char *s, unsigned x) { arca_debug_log_int((const uint8_t *)s, strlen(s), x); }
+
+
+void arca_log_ptr(const char *s, const void *x) { arca_debug_log_int((const uint8_t *)s, strlen(s), (unsigned)x); }
+
 [[noreturn]] void arca_panic(const char *s) {
 	arca_exception_reset();
 	arca_exception_append((const uint8_t *)s, strlen(s));

@@ -4,6 +4,6 @@
 
 pid_t __sys_set_tid_address(volatile int *tidptr)
 {
-	LOG_UNIMPL();
+  // TODO: does this need to be handled if we only have one thread?
 	return 0;
 }

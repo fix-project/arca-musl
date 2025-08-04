@@ -6,6 +6,8 @@
 #include <limits.h>
 #include "glue.h"
 
+#include <arca/arca.h>
+
 __attribute__((__visibility__("hidden")))
 extern const uint16_t size_classes[];
 

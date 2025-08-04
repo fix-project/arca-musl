@@ -8,7 +8,8 @@ int __sys_isatty(int fd)
 	return 0;
 }
 
-int __sys_open(const char *path, int flags, mode_t mode) {
+int __sys_open(const char *path, int flags, mode_t mode)
+{
 	arcad f = arca_symbolic_create_string("open");
 	f = arca_function_apply(f, arca_blob_create_string(path));
 	f = arca_function_apply(f, arca_word_create(flags));
@@ -24,7 +25,8 @@ int __sys_open(const char *path, int flags, mode_t mode) {
 
 weak_alias(__sys_open, __sys_open_cp);
 
-int __sys_close(int fd) {
+int __sys_close(int fd)
+{
 	arcad f = arca_symbolic_create_string("close");
 	f = arca_function_apply(f, arca_word_create(fd));
 	arca_call_with_current_continuation(f);
@@ -38,7 +40,8 @@ int __sys_close(int fd) {
 
 weak_alias(__sys_close, __sys_close_cp);
 
-ssize_t __sys_read(int fd, void *buf, size_t count) {
+ssize_t __sys_read(int fd, void *buf, size_t count)
+{
 	arcad f = arca_symbolic_create_string("read");
 	f = arca_function_apply(f, arca_word_create(fd));
 	f = arca_function_apply(f, arca_word_create(count));
@@ -51,7 +54,8 @@ ssize_t __sys_read(int fd, void *buf, size_t count) {
 
 weak_alias(__sys_read, __sys_read_cp);
 
-ssize_t __sys_readv(int fd, const struct iovec *iov, int iovcnt) {
+ssize_t __sys_readv(int fd, const struct iovec *iov, int iovcnt)
+{
 	arca_panic("sys_readv");
 }
 
