@@ -15,5 +15,6 @@ ssize_t __sys_readv(int fd, const struct iovec *iov, int iovcnt);
 ssize_t __sys_writev(int fd, const struct iovec *iov, int iovcnt);
 [[noreturn]] void __sys_exit_group(int status);
 [[noreturn]] void __sys_exit(int status);
+int __sys_fsync(int fd);
 
 #endif

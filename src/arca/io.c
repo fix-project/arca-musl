@@ -93,3 +93,9 @@ ssize_t __sys_writev(int fd, const struct iovec *iov, int iovcnt)
 		arca_call_with_current_continuation(f);
 	}
 }
+
+int __sys_fsync(int fd)
+{
+	(void)fd;
+	return 0;
+}
