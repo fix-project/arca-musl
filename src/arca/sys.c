@@ -78,16 +78,6 @@ arcad arca_word_create(uint64_t value)
 	return syscall(__NR_create_word, value);
 }
 
-arcad arca_atom_create(const uint8_t *data, size_t len)
-{
-	return syscall(__NR_create_atom, data, len);
-}
-
-arcad arca_exception_create(arcad value)
-{
-	return syscall(__NR_create_error, value);
-}
-
 arcad arca_blob_create(const uint8_t *data, size_t len)
 {
 	return syscall(__NR_create_blob, data, len);
@@ -116,11 +106,6 @@ arcad arca_function_create(bool arca, arcad data)
 arcad arca_word_read(arcad word, uint64_t *output)
 {
 	return syscall(__NR_read, word, output);
-}
-
-arcad arca_exception_read(arcad error)
-{
-	return syscall(__NR_read, error);
 }
 
 arcad arca_blob_read(arcad blob, size_t offset, uint8_t *data, size_t len)
@@ -205,25 +190,4 @@ int64_t arca_debug_log_int(const uint8_t *message, size_t len, uint64_t value)
 int64_t arca_debug_show(const uint8_t *message, size_t len, arcad value)
 {
 	return syscall(__NR_debug_show, message, len, value);
-}
-
-int64_t arca_exception_reset(void)
-{
-	return syscall(__NR_error_reset);
-}
-
-int64_t arca_exception_append(const uint8_t *message, size_t len)
-{
-	return syscall(__NR_error_append, message, len);
-}
-
-int64_t arca_exception_append_int(uint64_t val)
-{
-	return syscall(__NR_error_append_int, val);
-}
-
-[[noreturn]] void arca_exception_return(void)
-{
-	syscall(__NR_error_return);
-	ud2();
 }

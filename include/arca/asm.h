@@ -12,41 +12,35 @@
 // constructors
 #define __NR_create_null 6
 #define __NR_create_word 7
-#define __NR_create_atom 8
-#define __NR_create_error 9
-#define __NR_create_blob 10
-#define __NR_create_tree 11
-#define __NR_create_page 12
-#define __NR_create_table 13
-#define __NR_create_function 14
+#define __NR_create_blob 8
+#define __NR_create_tree 9
+#define __NR_create_page 10
+#define __NR_create_table 11
+#define __NR_create_function 12
 
 // consumers
-#define __NR_read 15
-#define __NR_write 16
-#define __NR_equals 17
-#define __NR_length 18
-#define __NR_take 19
-#define __NR_put 20
-#define __NR_get 21
-#define __NR_set 22
-#define __NR_apply 23
-#define __NR_map 24
+#define __NR_read 13
+#define __NR_write 14
+#define __NR_equals 15
+#define __NR_length 16
+#define __NR_take 17
+#define __NR_put 18
+#define __NR_get 19
+#define __NR_set 20
+#define __NR_apply 21
+#define __NR_map 22
 
 // address space
-#define __NR_mmap 25
-#define __NR_mprotect 26
+#define __NR_mmap 23
+#define __NR_mprotect 24
 
 // control flow
-#define __NR_call_with_current_continuation 27
+#define __NR_call_with_current_continuation 25
 
 // debug
-#define __NR_debug_log 28
-#define __NR_debug_log_int 29
-#define __NR_debug_show 30
-#define __NR_error_reset 31
-#define __NR_error_append 32
-#define __NR_error_append_int 33
-#define __NR_error_return 34
+#define __NR_debug_log 26
+#define __NR_debug_log_int 27
+#define __NR_debug_show 28
 
 #define __ERR_bad_syscall 0
 #define __ERR_bad_index 1
@@ -57,13 +51,11 @@
 
 #define __TYPE_null 0
 #define __TYPE_word 1
-#define __TYPE_atom 2
-#define __TYPE_exception 3
-#define __TYPE_blob 4
-#define __TYPE_tuple 5
-#define __TYPE_page 6
-#define __TYPE_table 7
-#define __TYPE_function 8
+#define __TYPE_blob 2
+#define __TYPE_tuple 3
+#define __TYPE_page 4
+#define __TYPE_table 5
+#define __TYPE_function 6
 
 #define __MODE_none 0
 #define __MODE_read_only 1
