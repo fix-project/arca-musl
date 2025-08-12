@@ -1,3 +1,4 @@
+#include "arca/sys.h"
 #include <arca/arca.h>
 #include <string.h>
 
@@ -29,5 +30,9 @@ arcad arca_blob_create_string(const char *s)
 
 arcad arca_symbolic_create_string(const char *s)
 {
-	return arca_function_create(false, arca_blob_create_string(s));
+	arcad sym = arca_tuple_create(3);
+	arca_tuple_set(sym, 0, arca_blob_create_string("Symbolic"));
+	arca_tuple_set(sym, 1, arca_blob_create_string(s));
+	arca_tuple_set(sym, 2, arca_tuple_create(0));
+	return arca_function_create(sym);
 }

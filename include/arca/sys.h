@@ -27,11 +27,12 @@ arcad arca_blob_create(const uint8_t *data, size_t len);
 arcad arca_tuple_create(size_t len);
 arcad arca_page_create(size_t size);
 arcad arca_table_create(size_t size);
-arcad arca_function_create(bool arca, arcad data);
+arcad arca_function_create(arcad data);
 
 arcad arca_word_read(arcad word, uint64_t *output);
 arcad arca_blob_read(arcad blob, size_t offset, uint8_t *data, size_t len);
 arcad arca_page_read(arcad page, size_t offset, uint8_t *data, size_t len);
+arcad arca_function_read(arcad function);
 
 arcad arca_blob_write(arcad page, size_t offset, const uint8_t *data,
                       size_t len);
