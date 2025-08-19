@@ -29,15 +29,16 @@ hidden long __syscall_ret(unsigned long),
 #define syscall(...) __syscall_ret(__syscall(__VA_ARGS__))
 #define __SYSCALL_DISP(...) __syscall(__VA_ARGS__)
 
-[[noreturn]] int bad_syscall(const char *file, const char *function, const char *syscall);
+[[noreturn]] int bad_syscall(const char *file, const char *function,
+                             const char *syscall);
 
 #define __syscall(x, ...) bad_syscall(__FILE__, __FUNCTION__, #x)
 #define __syscall_cp(x, ...) bad_syscall(__FILE__, __FUNCTION__, #x)
 
 #define socketcall(nm, a, b, c, d, e, f)                                       \
-  __syscall_ret(__socketcall(nm, a, b, c, d, e, f))
+	__syscall_ret(__socketcall(nm, a, b, c, d, e, f))
 #define socketcall_cp(nm, a, b, c, d, e, f)                                    \
-  __syscall_ret(__socketcall_cp(nm, a, b, c, d, e, f))
+	__syscall_ret(__socketcall_cp(nm, a, b, c, d, e, f))
 
 // #define __syscall_cp0(n) (__syscall_cp)(n, 0, 0, 0, 0, 0, 0)
 // #define __syscall_cp1(n, a) (__syscall_cp)(n, __scc(a), 0, 0, 0, 0, 0)
@@ -59,28 +60,30 @@ hidden long __syscall_ret(unsigned long),
 static inline long __alt_socketcall(int sys, int sock, int cp, syscall_arg_t a,
                                     syscall_arg_t b, syscall_arg_t c,
                                     syscall_arg_t d, syscall_arg_t e,
-                                    syscall_arg_t f) {
-  long r;
-  if (cp)
-    r = __syscall_cp(sys, a, b, c, d, e, f);
-  else
-    r = __syscall(sys, a, b, c, d, e, f);
-  if (r != -ENOSYS)
-    return r;
+                                    syscall_arg_t f)
+{
+	long r;
+	if (cp)
+		r = __syscall_cp(sys, a, b, c, d, e, f);
+	else
+		r = __syscall(sys, a, b, c, d, e, f);
+	if (r != -ENOSYS) return r;
 #ifdef SYS_socketcall
-  if (cp)
-    r = __syscall_cp(SYS_socketcall, sock, ((long[6]){a, b, c, d, e, f}));
-  else
-    r = __syscall(SYS_socketcall, sock, ((long[6]){a, b, c, d, e, f}));
+	if (cp)
+		r = __syscall_cp(SYS_socketcall, sock,
+		                 ((long[6]){a, b, c, d, e, f}));
+	else
+		r = __syscall(SYS_socketcall, sock,
+		              ((long[6]){a, b, c, d, e, f}));
 #endif
-  return r;
+	return r;
 }
 #define __socketcall(nm, a, b, c, d, e, f)                                     \
-  __alt_socketcall(SYS_##nm, __SC_##nm, 0, __scc(a), __scc(b), __scc(c),       \
-                   __scc(d), __scc(e), __scc(f))
+	__alt_socketcall(SYS_##nm, __SC_##nm, 0, __scc(a), __scc(b), __scc(c), \
+	                 __scc(d), __scc(e), __scc(f))
 #define __socketcall_cp(nm, a, b, c, d, e, f)                                  \
-  __alt_socketcall(SYS_##nm, __SC_##nm, 1, __scc(a), __scc(b), __scc(c),       \
-                   __scc(d), __scc(e), __scc(f))
+	__alt_socketcall(SYS_##nm, __SC_##nm, 1, __scc(a), __scc(b), __scc(c), \
+	                 __scc(d), __scc(e), __scc(f))
 
 /* fixup legacy 16-bit junk */
 
@@ -378,21 +381,21 @@ static inline long __alt_socketcall(int sys, int sock, int cp, syscall_arg_t a,
 
 #ifdef SYS_open
 // #define __sys_open2(x, pn, fl) __syscall2(SYS_open, pn, (fl) | O_LARGEFILE)
-// #define __sys_open3(x, pn, fl, mo)                                             \
+// #define __sys_open3(x, pn, fl, mo) \
 //   __syscall3(SYS_open, pn, (fl) | O_LARGEFILE, mo)
 #define __sys_open_cp2(x, pn, fl)                                              \
-  __syscall_cp2(SYS_open, pn, (fl) | O_LARGEFILE)
+	__syscall_cp2(SYS_open, pn, (fl) | O_LARGEFILE)
 #define __sys_open_cp3(x, pn, fl, mo)                                          \
-  __syscall_cp3(SYS_open, pn, (fl) | O_LARGEFILE, mo)
+	__syscall_cp3(SYS_open, pn, (fl) | O_LARGEFILE, mo)
 #else
 #define __sys_open2(x, pn, fl)                                                 \
-  __syscall3(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE)
+	__syscall3(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE)
 #define __sys_open3(x, pn, fl, mo)                                             \
-  __syscall4(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE, mo)
+	__syscall4(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE, mo)
 #define __sys_open_cp2(x, pn, fl)                                              \
-  __syscall_cp3(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE)
+	__syscall_cp3(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE)
 #define __sys_open_cp3(x, pn, fl, mo)                                          \
-  __syscall_cp4(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE, mo)
+	__syscall_cp4(SYS_openat, AT_FDCWD, pn, (fl) | O_LARGEFILE, mo)
 #endif
 
 // #define __sys_open(...) __SYSCALL_DISP(__sys_open, , __VA_ARGS__)
