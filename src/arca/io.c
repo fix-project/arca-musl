@@ -1,3 +1,4 @@
+#include "arca/asm.h"
 #include "arca/sys.h"
 #include <arca/arca.h>
 #include <arca/io.h>
@@ -48,8 +49,18 @@ ssize_t __sys_read(int fd, void *buf, size_t count)
 	arca_call_with_current_continuation(f);
 	// TODO (Arca): handle errors
 	arcad r = arca_argument();
-	size_t x = arca_blob_read(r, 0, (uint8_t *)buf, count);
-	return x;
+	if (arca_type(r) == __TYPE_blob) {
+		size_t x = arca_blob_read(r, 0, (uint8_t *)buf, count);
+		arca_drop(r);
+		return x;
+	} else if (arca_type(r) == __TYPE_word) {
+		uint64_t err;
+		arca_word_read(r, &err);
+		arca_drop(r);
+		return err;
+	} else {
+		arca_panic("invalid return type from read effect");
+	}
 }
 
 weak_alias(__sys_read, __sys_read_cp);

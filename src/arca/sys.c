@@ -98,9 +98,9 @@ arcad arca_table_create(size_t size)
 	return syscall(__NR_create_table, size);
 }
 
-arcad arca_function_create(bool arca, arcad data)
+arcad arca_function_create(arcad data)
 {
-	return syscall(__NR_create_function, arca, data);
+	return syscall(__NR_create_function, data);
 }
 
 arcad arca_word_read(arcad word, uint64_t *output)
