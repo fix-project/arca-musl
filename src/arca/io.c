@@ -6,7 +6,7 @@
 int __sys_isatty(int fd)
 {
 	// TODO(arca): add effect for detecting TTY
-	return 0;
+	return 1;
 }
 
 int __sys_open(const char *path, int flags, mode_t mode)
@@ -109,4 +109,19 @@ int __sys_fsync(int fd)
 {
 	(void)fd;
 	return 0;
+}
+
+off_t __sys_lseek(int fd, off_t offset, int whence)
+{
+	arcad f = arca_symbolic_create_string("seek");
+	f = arca_function_apply(f, arca_word_create(fd));
+	f = arca_function_apply(f, arca_word_create(offset));
+	f = arca_function_apply(f, arca_word_create(whence));
+	arca_call_with_current_continuation(f);
+	// TODO (Arca): handle errors
+	arcad r = arca_argument();
+	uint64_t count;
+	arca_word_read(r, &count);
+	arca_drop(r);
+	return count;
 }

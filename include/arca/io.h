@@ -16,5 +16,6 @@ ssize_t __sys_writev(int fd, const struct iovec *iov, int iovcnt);
 [[noreturn]] void __sys_exit_group(int status);
 [[noreturn]] void __sys_exit(int status);
 int __sys_fsync(int fd);
+off_t __sys_lseek(int fd, off_t offset, int whence);
 
 #endif
