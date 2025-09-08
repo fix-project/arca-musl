@@ -55,6 +55,7 @@ int64_t arca_mmap(void *address, struct arca_entry *entry);
 int64_t arca_mprotect(void *address, int mode);
 
 int64_t arca_call_with_current_continuation(arcad value);
+arcad arca_get_continuation(void);
 
 int64_t arca_debug_log(const uint8_t *message, size_t len);
 int64_t arca_debug_log_int(const uint8_t *message, size_t len, uint64_t value);

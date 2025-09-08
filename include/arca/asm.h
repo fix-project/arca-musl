@@ -36,6 +36,7 @@
 
 // control flow
 #define __NR_call_with_current_continuation 25
+#define __NR_get_continuation 29
 
 // debug
 #define __NR_debug_log 26

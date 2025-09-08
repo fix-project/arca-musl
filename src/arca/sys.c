@@ -1,4 +1,5 @@
 #include <arca/arca.h>
+#include "arca/asm.h"
 #include "syscall_arch.h"
 
 #ifndef __scc
@@ -119,7 +120,10 @@ arcad arca_page_read(arcad page, size_t offset, uint8_t *data, size_t len)
 }
 
 arcad arca_page_write(arcad page, size_t offset, const uint8_t *data,
-                      size_t len);
+                      size_t len)
+{
+	return syscall(__NR_write, page, offset, data, len);
+}
 
 int64_t arca_equals(arcad x, arcad y)
 {
@@ -175,6 +179,11 @@ int64_t arca_mprotect(void *address, int mode)
 arcad arca_call_with_current_continuation(arcad value)
 {
 	return syscall(__NR_call_with_current_continuation, value);
+}
+
+arcad arca_get_continuation(void)
+{
+	return syscall(__NR_get_continuation);
 }
 
 int64_t arca_debug_log(const uint8_t *message, size_t len)
