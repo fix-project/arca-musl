@@ -20,9 +20,9 @@ static char *MMAP_REGION = NULL;
 static void set_mmap_region(void) {
   if (!MMAP_REGION_START) {
     uintptr_t brk = (uintptr_t)BREAK;
-    uintptr_t offset_from_aligned = brk % TwoMB;
+    uintptr_t offset_from_aligned = brk % OneGB;
     if (offset_from_aligned != 0) {
-      brk += TwoMB - offset_from_aligned;
+      brk += OneGB - offset_from_aligned;
     }
     MMAP_REGION_START = (char *)brk;
   }
@@ -95,9 +95,23 @@ void *__sys_mmap2(void *addr, size_t len, int prot, int flags, int filedes,
 	// TODO (Arca): don't just bump allocate
         size_t amount = 0;
 	while (amount < len) {
+		uintptr_t addr = (uintptr_t)start + amount;
+		size_t left = len - amount;
+
 		arcad data;
                 int mode;
-                if (prot == PROT_NONE) {
+
+		int increment = 4096;
+
+		if (prot == PROT_NONE && (addr % OneGB == 0) && left >= OneGB) {
+		  data = OneGB;
+		  mode = __MODE_none;
+		  increment = OneGB;
+		} else if (prot == PROT_NONE && (addr % TwoMB == 0) && left >= TwoMB) {
+		  data = TwoMB;
+		  mode = __MODE_none;
+		  increment = TwoMB;
+		} else if (prot == PROT_NONE) {
                   data = 4096;
                   mode = __MODE_none;
                 } else {
@@ -112,7 +126,7 @@ void *__sys_mmap2(void *addr, size_t len, int prot, int flags, int filedes,
 		arca_mmap(start + amount, &entry);
 		if (entry.datatype != __TYPE_null)
 			arca_drop(entry.data);
-		amount += 4096;
+		amount += increment;
 	}
         if (!(flags & MAP_FIXED)) {
           MMAP_REGION = start + amount;
