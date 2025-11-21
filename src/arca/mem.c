@@ -19,7 +19,12 @@ static char *MMAP_REGION = NULL;
 
 static void set_mmap_region(void) {
   if (!MMAP_REGION_START) {
-    MMAP_REGION_START = (char *)((TwoMB - ((uintptr_t)BREAK % TwoMB)) % TwoMB);
+    uintptr_t brk = (uintptr_t)BREAK;
+    uintptr_t offset_from_aligned = brk % TwoMB;
+    if (offset_from_aligned != 0) {
+      brk += TwoMB - offset_from_aligned;
+    }
+    MMAP_REGION_START = (char *)brk;
   }
   if (!MMAP_REGION) {
     MMAP_REGION = MMAP_REGION_START;
