@@ -11,48 +11,57 @@ static char *BREAK = &_end;
 static char *MAPPED = &_end;
 
 #define FourKB (1 << 12)
-#define TwoMB  (1 << 21)
-#define OneGB  (1 << 30)
+#define TwoMB (1 << 21)
+#define OneGB (1 << 30)
 
 static char *MMAP_REGION_START = NULL;
 static char *MMAP_REGION = NULL;
 
-static void set_mmap_region(void) {
-  if (!MMAP_REGION_START) {
-    uintptr_t brk = (uintptr_t)BREAK;
-    uintptr_t offset_from_aligned = brk % OneGB;
-    if (offset_from_aligned != 0) {
-      brk += OneGB - offset_from_aligned;
-    }
-    MMAP_REGION_START = (char *)brk;
-  }
-  if (!MMAP_REGION) {
-    MMAP_REGION = MMAP_REGION_START;
-  }
+static void *align(void *p, size_t align)
+{
+	uintptr_t x = (uintptr_t)p;
+	uintptr_t offset_from_aligned = x % align;
+	if (offset_from_aligned != 0) {
+		x += align - offset_from_aligned;
+	}
+	return (void *)x;
+}
+
+static unsigned roundup(unsigned x, size_t align)
+{
+	unsigned offset_from_aligned = x % align;
+	if (offset_from_aligned != 0) {
+		x += align - offset_from_aligned;
+	}
+	return x;
+}
+
+static void set_mmap_region(void)
+{
+	if (!MMAP_REGION_START) {
+		MMAP_REGION_START = align(BREAK, OneGB);
+	}
+	if (!MMAP_REGION) {
+		MMAP_REGION = MMAP_REGION_START;
+	}
 }
 
 void *__sys_brk(void *p)
 {
-  set_mmap_region();
-	if (p >= (void *)BREAK && p <= MMAP_REGION_START) {
+	set_mmap_region();
+	if (p >= (void *)BREAK && p <= (void *)MMAP_REGION_START) {
 		BREAK = p;
 	}
-        while (MAPPED < BREAK) {
-          if ((uintptr_t)MAPPED % 4096) {
-            MAPPED++;
-          } else {
-            arcad page = arca_page_create(4096);
-            // TODO (Arca): handle errors
-            struct arca_entry entry = {
-              .mode = __MODE_read_write,
-              .data = page,
-            };
-            arca_mmap(MAPPED, &entry);
-            if (entry.datatype != __TYPE_null)
-              arca_drop(entry.data);
-            MAPPED += 4096;
-          }
-        }
+	MAPPED = align(MAPPED, 4096);
+	if (BREAK > MAPPED) {
+		int64_t result =
+		    arca_compat_mmap(MAPPED, BREAK - MAPPED, __MODE_read_write);
+		if (result < 0) {
+			errno = ENOMEM;
+			return NULL;
+		}
+		MAPPED = BREAK;
+	}
 	return BREAK;
 }
 
@@ -66,7 +75,7 @@ void *__sys_mmap(void *addr, size_t len, int prot, int flags, int filedes,
 void *__sys_mmap2(void *addr, size_t len, int prot, int flags, int filedes,
                   unsigned long off)
 {
-  set_mmap_region();
+	set_mmap_region();
 	if (!len) {
 		errno = EINVAL;
 		return MAP_FAILED;
@@ -82,80 +91,60 @@ void *__sys_mmap2(void *addr, size_t len, int prot, int flags, int filedes,
 		return MAP_FAILED;
 	}
 
-        char *start;
+	char *start;
 	if (flags & MAP_FIXED) {
-          start = (char *)addr;
+		start = (char *)addr;
 	} else {
-          while ((uintptr_t)MMAP_REGION % 4096) {
-            MMAP_REGION++;
-          }
-          start = MMAP_REGION;
-        }
+		while ((uintptr_t)MMAP_REGION % 4096) {
+			MMAP_REGION++;
+		}
+		start = MMAP_REGION;
+	}
 
 	// TODO (Arca): don't just bump allocate
-        size_t amount = 0;
-	while (amount < len) {
-		uintptr_t addr = (uintptr_t)start + amount;
-		size_t left = len - amount;
-
-		arcad data;
-                int mode;
-
-		int increment = 4096;
-
-		if (prot == PROT_NONE && (addr % OneGB == 0) && left >= OneGB) {
-		  data = OneGB;
-		  mode = __MODE_none;
-		  increment = OneGB;
-		} else if (prot == PROT_NONE && (addr % TwoMB == 0) && left >= TwoMB) {
-		  data = TwoMB;
-		  mode = __MODE_none;
-		  increment = TwoMB;
-		} else if (prot == PROT_NONE) {
-                  data = 4096;
-                  mode = __MODE_none;
-                } else {
-                  data = arca_page_create(4096);
-                  mode = (prot & PROT_WRITE) ? __MODE_read_write : __MODE_read_only;
-                }
-		// TODO (Arca): handle errors
-		struct arca_entry entry = {
-		    .mode = mode,
-		    .data = data,
-		};
-		arca_mmap(start + amount, &entry);
-		if (entry.datatype != __TYPE_null)
-			arca_drop(entry.data);
-		amount += increment;
+	unsigned mode;
+	if (prot == PROT_NONE) {
+		mode = __MODE_none;
+	} else if (prot & PROT_WRITE) {
+		mode = __MODE_read_write;
+	} else {
+		mode = __MODE_read_only;
+	};
+	int64_t result = arca_compat_mmap(start, len, mode);
+	if (result < 0) {
+		errno = ENOMEM;
+		return MAP_FAILED;
 	}
-        if (!(flags & MAP_FIXED)) {
-          MMAP_REGION = start + amount;
-        }
+	if (!(flags & MAP_FIXED)) {
+		MMAP_REGION = start + roundup(len, 4096);
+	}
 	return start;
 }
 
-int __sys_mprotect(void *addr, size_t len, int prot) {
-  char *start = (char *)(((uintptr_t)addr / 4096) * 4096);
-  char *end = (char *)addr + len;
-  while ((uintptr_t)end % 4096) {
-    end++;
-  }
-  size_t n = (end - start) / 4096;
-  for (int i = 0; i < n; i++) {
-    void *p = start + i*4096;
-    int mode;
-    if (prot == PROT_NONE) {
-      mode = __MODE_none;
-    } else if (prot & PROT_WRITE) {
-      mode = __MODE_read_write;
-    } else {
-      mode = __MODE_read_only;
-    }
-    arca_mprotect(p, mode);
-  }
-  return 0;
+int __sys_mprotect(void *addr, size_t len, int prot)
+{
+	char *start = (char *)(((uintptr_t)addr / 4096) * 4096);
+	char *end = (char *)addr + len;
+	while ((uintptr_t)end % 4096) {
+		end++;
+	}
+	size_t n = (end - start) / 4096;
+	for (int i = 0; i < n; i++) {
+		void *p = start + i * 4096;
+		int mode;
+		if (prot == PROT_NONE) {
+			mode = __MODE_none;
+		} else if (prot & PROT_WRITE) {
+			mode = __MODE_read_write;
+		} else {
+			mode = __MODE_read_only;
+		}
+		arca_mprotect(p, mode);
+	}
+	return 0;
 }
 
-int __sys_munmap(void *addr, size_t len) {
-  return mprotect(addr, len, PROT_NONE);
+int __sys_munmap(void *addr, size_t len)
+{
+	return mprotect(addr, len, PROT_NONE);
 }

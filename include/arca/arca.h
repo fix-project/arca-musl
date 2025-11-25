@@ -10,5 +10,6 @@ void arca_log_ptr(const char *s, const void *x);
 
 arcad arca_blob_create_string(const char *s);
 arcad arca_symbolic_create_string(const char *s);
+void arca_setrlimit(size_t mem);
 
 #endif

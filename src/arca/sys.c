@@ -176,6 +176,11 @@ int64_t arca_mprotect(void *address, int mode)
 	return syscall(__NR_mprotect, address, mode);
 }
 
+int64_t arca_compat_mmap(void *address, size_t size, unsigned mode)
+{
+	return syscall(__NR_compat_mmap, address, size, mode);
+}
+
 arcad arca_call_with_current_continuation(arcad value)
 {
 	return syscall(__NR_call_with_current_continuation, value);

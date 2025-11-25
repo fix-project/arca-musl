@@ -14,7 +14,8 @@ void arca_log_int(const char *s, unsigned x)
 
 void arca_log_ptr(const char *s, const void *x)
 {
-	arca_debug_log_int((const uint8_t *)s, strlen(s), (unsigned)x);
+	arca_debug_log_int((const uint8_t *)s, strlen(s),
+	                   (unsigned)(uintptr_t)x);
 }
 
 [[noreturn]] void arca_panic(const char *s)
@@ -35,4 +36,15 @@ arcad arca_symbolic_create_string(const char *s)
 	arca_tuple_set(sym, 1, arca_blob_create_string(s));
 	arca_tuple_set(sym, 2, arca_tuple_create(0));
 	return arca_function_create(sym);
+}
+
+void arca_setrlimit(size_t mem)
+{
+	arcad sym = arca_tuple_create(3);
+	arca_tuple_set(sym, 0, arca_blob_create_string("Symbolic"));
+	arca_tuple_set(sym, 1, arca_blob_create_string("arca:rlimit"));
+	arcad args = arca_tuple_create(1);
+	arca_tuple_set(args, 0, arca_word_create(mem));
+	arca_tuple_set(sym, 2, args);
+	arca_call_with_current_continuation(arca_function_create(sym));
 }

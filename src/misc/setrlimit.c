@@ -3,8 +3,11 @@
 #include "syscall.h"
 #include "libc.h"
 
-#define MIN(a, b) ((a)<(b) ? (a) : (b))
-#define FIX(x) do{ if ((x)>=SYSCALL_RLIM_INFINITY) (x)=RLIM_INFINITY; }while(0)
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define FIX(x)                                                                 \
+	do {                                                                   \
+		if ((x) >= SYSCALL_RLIM_INFINITY) (x) = RLIM_INFINITY;         \
+	} while (0)
 
 struct ctx {
 	unsigned long lim[2];
@@ -16,7 +19,7 @@ struct ctx {
 static void do_setrlimit(void *p)
 {
 	struct ctx *c = p;
-	if (c->err>0) return;
+	if (c->err > 0) return;
 	c->err = -__syscall(SYS_setrlimit, c->res, c->lim);
 }
 #endif
@@ -35,13 +38,13 @@ int setrlimit(int resource, const struct rlimit *rlim)
 	if (ret != -ENOSYS) return __syscall_ret(ret);
 
 	struct ctx c = {
-		.lim[0] = MIN(rlim->rlim_cur, MIN(-1UL, SYSCALL_RLIM_INFINITY)),
-		.lim[1] = MIN(rlim->rlim_max, MIN(-1UL, SYSCALL_RLIM_INFINITY)),
-		.res = resource, .err = -1
-	};
+	    .lim[0] = MIN(rlim->rlim_cur, MIN(-1UL, SYSCALL_RLIM_INFINITY)),
+	    .lim[1] = MIN(rlim->rlim_max, MIN(-1UL, SYSCALL_RLIM_INFINITY)),
+	    .res = resource,
+	    .err = -1};
 	__synccall(do_setrlimit, &c);
 	if (c.err) {
-		if (c.err>0) errno = c.err;
+		if (c.err > 0) errno = c.err;
 		return -1;
 	}
 	return 0;
