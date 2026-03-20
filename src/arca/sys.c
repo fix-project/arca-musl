@@ -119,6 +119,15 @@ arcad arca_page_read(arcad page, size_t offset, uint8_t *data, size_t len)
 	return syscall(__NR_read, page, offset, data, len);
 }
 
+arcad arca_function_read(arcad function) {
+	return syscall(__NR_read, function);
+}
+
+arcad arca_blob_write(arcad blob, size_t offset, const uint8_t *data,
+                      size_t len) {
+	return syscall(__NR_write, blob, offset, data, len);
+}
+
 arcad arca_page_write(arcad page, size_t offset, const uint8_t *data,
                       size_t len)
 {
@@ -159,6 +168,11 @@ int64_t arca_table_set(arcad table, size_t index,
 arcad arca_function_apply(arcad target, arcad argument)
 {
 	return syscall(__NR_apply, target, argument);
+}
+
+arcad arca_function_force(arcad target)
+{
+	return syscall(__NR_force, target);
 }
 
 int64_t arca_table_map(arcad table, void *address, struct arca_entry *entry)

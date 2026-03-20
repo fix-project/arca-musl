@@ -34,7 +34,7 @@ arcad arca_blob_read(arcad blob, size_t offset, uint8_t *data, size_t len);
 arcad arca_page_read(arcad page, size_t offset, uint8_t *data, size_t len);
 arcad arca_function_read(arcad function);
 
-arcad arca_blob_write(arcad page, size_t offset, const uint8_t *data,
+arcad arca_blob_write(arcad blob, size_t offset, const uint8_t *data,
                       size_t len);
 arcad arca_page_write(arcad page, size_t offset, const uint8_t *data,
                       size_t len);
